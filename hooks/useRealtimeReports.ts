@@ -20,9 +20,19 @@ export function useRealtimeReports(options: UseRealtimeReportsOptions = {}) {
 
   const fetchReports = useCallback(async () => {
     const supabase = createClient()
+    // Join with users table to get reporter info
     let query = supabase
       .from('reports')
-      .select('*')
+      .select(`
+        *,
+        users (
+          id,
+          full_name,
+          email,
+          role,
+          avatar_url
+        )
+      `)
       .order('created_at', { ascending: false })
 
     if (options.filter?.province) query = query.eq('province', options.filter.province)
@@ -30,7 +40,7 @@ export function useRealtimeReports(options: UseRealtimeReportsOptions = {}) {
     if (options.filter?.district) query = query.eq('district', options.filter.district)
 
     const { data, error } = await query
-    if (!error && data) setReports(data)
+    if (!error && data) setReports(data as Report[])
     setLoading(false)
   }, [options.filter?.province, options.filter?.city, options.filter?.district])
 
@@ -44,23 +54,41 @@ export function useRealtimeReports(options: UseRealtimeReportsOptions = {}) {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'reports' },
-        (payload) => {
+        async (payload) => {
           const newReport = payload.new as Report
           // Apply filter if set
           if (options.filter?.province && newReport.province !== options.filter.province) return
           if (options.filter?.city && newReport.city !== options.filter.city) return
           if (options.filter?.district && newReport.district !== options.filter.district) return
 
-          setReports(prev => [newReport, ...prev])
-          setNewReportCount(c => c + 1)
+          // Fetch with user join for the new report
+          const { data } = await supabase
+            .from('reports')
+            .select(`*, users(id, full_name, email, role, avatar_url)`)
+            .eq('id', newReport.id)
+            .single()
+
+          if (data) {
+            setReports(prev => [data as Report, ...prev])
+            setNewReportCount(c => c + 1)
+          }
         }
       )
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'reports' },
-        (payload) => {
+        async (payload) => {
           const updated = payload.new as Report
-          setReports(prev => prev.map(r => r.id === updated.id ? updated : r))
+          // Fetch with user join for updated report
+          const { data } = await supabase
+            .from('reports')
+            .select(`*, users(id, full_name, email, role, avatar_url)`)
+            .eq('id', updated.id)
+            .single()
+
+          if (data) {
+            setReports(prev => prev.map(r => r.id === updated.id ? data as Report : r))
+          }
         }
       )
       .on(

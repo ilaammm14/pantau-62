@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Trash2, CheckCircle, Clock, Loader2, Eye, AlertTriangle, X, Wifi } from 'lucide-react'
+import { Search, Trash2, CheckCircle, Clock, Loader2, Eye, AlertTriangle, X, Wifi, User } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -168,6 +168,15 @@ export default function AdminReportsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-white text-sm truncate">{report.title}</div>
                     <div className="text-xs text-slate-500 truncate mt-0.5">{report.location}</div>
+                    {/* Reporter info */}
+                    {report.users && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <User className="w-3 h-3 text-slate-600" />
+                        <span className="text-xs text-slate-600 truncate">
+                          {report.users.full_name || report.users.email || 'Pengguna'}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex gap-1.5 mt-2 flex-wrap items-center">
                       <PriorityBadge priority={report.priority} />
                       <Badge className={`${statusConfig[report.status].bg} ${statusConfig[report.status].color} border text-xs`}>
@@ -215,7 +224,7 @@ export default function AdminReportsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700/50">
-                  {['Foto', 'Laporan', 'Kategori', 'Lokasi', 'Priority', 'Status', 'AI Score', 'Aksi'].map(h => (
+                  {['Foto', 'Laporan', 'Pelapor', 'Kategori', 'Lokasi', 'Priority', 'Status', 'AI Score', 'Aksi'].map(h => (
                     <th key={h} className="text-left py-4 px-4 text-xs text-slate-500 font-medium">{h}</th>
                   ))}
                 </tr>
@@ -240,6 +249,31 @@ export default function AdminReportsPage() {
                     <td className="py-3 px-4">
                       <div className="font-medium text-white truncate max-w-[160px]">{report.title}</div>
                       <div className="text-xs text-slate-500">{formatDate(report.created_at)}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                      {report.users ? (
+                        <div className="flex items-center gap-2">
+                          {report.users.avatar_url ? (
+                            <img src={report.users.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0">
+                              <span className="text-xs font-bold text-cyan-400">
+                                {report.users.full_name?.charAt(0)?.toUpperCase() ?? '?'}
+                              </span>
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <div className="text-xs text-white truncate max-w-[100px]">
+                              {report.users.full_name || 'Pengguna'}
+                            </div>
+                            <div className="text-xs text-slate-600 truncate max-w-[100px]">
+                              {report.users.email}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-600">—</span>
+                      )}
                     </td>
                     <td className="py-3 px-4 text-slate-400 text-xs">{categoryLabels[report.category as keyof typeof categoryLabels]}</td>
                     <td className="py-3 px-4 text-slate-400 text-xs truncate max-w-[120px]">{report.location}</td>

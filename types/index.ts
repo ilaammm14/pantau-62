@@ -5,6 +5,7 @@ export interface User {
   full_name: string
   email: string
   role: UserRole
+  avatar_url?: string
   created_at: string
 }
 
@@ -22,6 +23,20 @@ export interface LocationData {
   latitude: number
   longitude: number
 }
+
+export interface AIAnalysisResult {
+  score: number                        // 0–100
+  priority: ReportPriority
+  confidence: number                   // 0–100 percentage
+  detectedCategory: ReportCategory | null
+  visualSummary: string
+  severityLevel: 'low' | 'medium' | 'high' | 'critical'
+  detectedObjects: string[]
+  analysisNotes: string[]
+}
+
+// Alias used by ai-scoring.ts
+export type VisualAnalysis = AIAnalysisResult
 
 export interface Report {
   id: string
@@ -42,6 +57,9 @@ export interface Report {
   priority: ReportPriority
   status: ReportStatus
   ai_score: number
+  ai_confidence?: number
+  ai_detected_category?: string
+  ai_visual_summary?: string
   created_at: string
   users?: User
 }
