@@ -3,41 +3,31 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
-import { MapPin, Filter } from 'lucide-react'
+import { MapPin, Filter, Wifi } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { createClient } from '@/lib/supabase/client'
 import { priorityConfig } from '@/lib/utils'
+import { useRealtimeReports } from '@/hooks/useRealtimeReports'
 import type { Report } from '@/types'
 import dynamicImport from 'next/dynamic'
 
 const ReportsMap = dynamicImport(() => import('@/components/map/ReportsMap'), { ssr: false })
 
 export default function AdminMapPage() {
-  const [reports, setReports] = useState<Report[]>([])
+  const { reports: allReports } = useRealtimeReports()
   const [filtered, setFiltered] = useState<Report[]>([])
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
 
-  useEffect(() => {
-    const fetch = async () => {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('reports')
-        .select('*')
-        .not('latitude', 'is', null)
-        .neq('status', 'resolved') // hide resolved reports from map
-      if (data) { setReports(data as Report[]); setFiltered(data as Report[]) }
-    }
-    fetch()
-  }, [])
+  // Base: exclude resolved
+  const reports = allReports.filter(r => r.status !== 'resolved' && r.latitude && r.longitude)
 
   useEffect(() => {
     let result = reports
     if (priorityFilter !== 'all') result = result.filter(r => r.priority === priorityFilter)
     if (statusFilter !== 'all') result = result.filter(r => r.status === statusFilter)
     setFiltered(result)
-  }, [priorityFilter, statusFilter, reports])
+  }, [priorityFilter, statusFilter, allReports])
 
   const counts = {
     high: reports.filter(r => r.priority === 'high').length,
@@ -48,7 +38,13 @@ export default function AdminMapPage() {
   return (
     <div className="p-4 lg:p-8 min-h-screen grid-bg">
       <div className="mb-6">
-        <h1 className="text-xl lg:text-2xl font-bold text-white">Map Monitoring</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl lg:text-2xl font-bold text-white">Map Monitoring</h1>
+          <div className="flex items-center gap-1 ml-auto">
+            <Wifi className="w-3 h-3 text-cyan-400" />
+            <span className="text-xs text-cyan-400 font-mono">LIVE</span>
+          </div>
+        </div>
         <p className="text-slate-400 text-sm mt-1">Visualisasi real-time semua laporan di peta</p>
       </div>
 

@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Trash2, CheckCircle, Clock, Loader2, Eye, AlertTriangle, X } from 'lucide-react'
+import { Search, Trash2, CheckCircle, Clock, Loader2, Eye, AlertTriangle, X, Wifi } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,13 +23,13 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { statusConfig, categoryLabels, formatDate } from '@/lib/utils'
 import { PriorityBadge } from '@/components/ui/priority-badge'
+import { useRealtimeReports } from '@/hooks/useRealtimeReports'
 import type { Report, ReportStatus } from '@/types'
 import Link from 'next/link'
 
 export default function AdminReportsPage() {
-  const [reports, setReports] = useState<Report[]>([])
+  const { reports, loading, newReportCount, resetNewCount } = useRealtimeReports()
   const [filtered, setFiltered] = useState<Report[]>([])
-  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
@@ -38,25 +38,8 @@ export default function AdminReportsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [reportToDelete, setReportToDelete] = useState<Report | null>(null)
 
-  const fetchReports = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('reports')
-      .select('*')
-      .order('created_at', { ascending: false })
-    
-    if (error) {
-      console.error('Fetch error:', error)
-    }
-    
-    if (data) { 
-      setReports(data)
-      setFiltered(data)
-    }
-    setLoading(false)
-  }
-
-  useEffect(() => { fetchReports() }, [])
+  // Reset new count when page is visited
+  useEffect(() => { resetNewCount() }, [resetNewCount])
 
   useEffect(() => {
     let result = reports
@@ -77,15 +60,11 @@ export default function AdminReportsPage() {
     setUpdating(id)
     const supabase = createClient()
     const { error } = await supabase.from('reports').update({ status }).eq('id', id)
-    
     if (error) {
       console.error('Update error:', error)
       alert(`Gagal update status: ${error.message}`)
-      setUpdating(null)
-      return
     }
-    
-    setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r))
+    // Realtime subscription handles state update automatically
     setUpdating(null)
   }
 
@@ -96,20 +75,14 @@ export default function AdminReportsPage() {
 
   const confirmDelete = async () => {
     if (!reportToDelete) return
-    
     setUpdating(reportToDelete.id)
     const supabase = createClient()
     const { error } = await supabase.from('reports').delete().eq('id', reportToDelete.id)
-    
     if (error) {
       console.error('Delete error:', error)
       alert(`Gagal hapus laporan: ${error.message}`)
-      setUpdating(null)
-      setDeleteDialogOpen(false)
-      return
     }
-    
-    setReports(prev => prev.filter(r => r.id !== reportToDelete.id))
+    // Realtime subscription handles removal automatically
     setUpdating(null)
     setDeleteDialogOpen(false)
     setReportToDelete(null)
@@ -118,7 +91,13 @@ export default function AdminReportsPage() {
   return (
     <div className="p-4 lg:p-8 min-h-screen grid-bg">
       <div className="mb-6">
-        <h1 className="text-xl lg:text-2xl font-bold text-white">Reports Management</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl lg:text-2xl font-bold text-white">Reports Management</h1>
+          <div className="flex items-center gap-1 ml-auto">
+            <Wifi className="w-3 h-3 text-cyan-400" />
+            <span className="text-xs text-cyan-400 font-mono hidden sm:inline">LIVE</span>
+          </div>
+        </div>
         <p className="text-slate-400 text-sm mt-1">{filtered.length} laporan ditemukan</p>
       </div>
 

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, CheckCircle, Clock, AlertTriangle, TrendingUp, Activity, Brain, Zap } from 'lucide-react'
+import { FileText, CheckCircle, Clock, AlertTriangle, TrendingUp, Activity, Brain, Zap, Wifi } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -13,41 +13,19 @@ import { createClient } from '@/lib/supabase/client'
 import { statusConfig, categoryLabels, formatDate } from '@/lib/utils'
 import { PriorityBadge } from '@/components/ui/priority-badge'
 import { getAIRecommendation } from '@/lib/ai-scoring'
+import { useRealtimeReports } from '@/hooks/useRealtimeReports'
 import type { Report, DashboardStats } from '@/types'
 
 export default function AdminDashboard() {
-  const [reports, setReports] = useState<Report[]>([])
-  const [stats, setStats] = useState<DashboardStats>({ total: 0, pending: 0, processing: 0, resolved: 0, high_priority: 0 })
-  const [loading, setLoading] = useState(true)
+  const { reports, loading, newReportCount } = useRealtimeReports()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const supabase = createClient()
-      
-      // Temporary: fetch without join to avoid RLS error
-      const { data, error } = await supabase
-        .from('reports')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error fetching reports:', error)
-      }
-
-      if (data) {
-        setReports(data)
-        setStats({
-          total: data.length,
-          pending: data.filter(r => r.status === 'pending').length,
-          processing: data.filter(r => r.status === 'processing').length,
-          resolved: data.filter(r => r.status === 'resolved').length,
-          high_priority: data.filter(r => r.priority === 'high').length,
-        })
-      }
-      setLoading(false)
-    }
-    fetchData()
-  }, [])
+  const stats: DashboardStats = {
+    total: reports.length,
+    pending: reports.filter(r => r.status === 'pending').length,
+    processing: reports.filter(r => r.status === 'processing').length,
+    resolved: reports.filter(r => r.status === 'resolved').length,
+    high_priority: reports.filter(r => r.priority === 'high').length,
+  }
 
   const categoryChartData = Object.entries(categoryLabels).map(([key, label]) => ({
     name: label.split(' ')[0],
@@ -82,9 +60,23 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-2 mb-1">
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
           <span className="text-xs text-slate-500 font-mono">SYSTEM ONLINE</span>
+          <div className="flex items-center gap-1 ml-auto">
+            <Wifi className="w-3 h-3 text-cyan-400" />
+            <span className="text-xs text-cyan-400 font-mono">REALTIME</span>
+          </div>
         </div>
         <h1 className="text-xl lg:text-2xl font-bold text-white">Admin Dashboard</h1>
         <p className="text-slate-400 text-sm">Smart City Monitoring & Decision Support</p>
+        {newReportCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-400"
+          >
+            <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
+            {newReportCount} laporan baru masuk
+          </motion.div>
+        )}
       </div>
 
       {/* Stats */}

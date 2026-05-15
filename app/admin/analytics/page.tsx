@@ -7,23 +7,14 @@ import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, Legend } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TrendingUp, BarChart3, PieChart as PieIcon, Activity } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { useRealtimeReports } from '@/hooks/useRealtimeReports'
 import { categoryLabels } from '@/lib/utils'
 import type { Report } from '@/types'
 
 const COLORS = ['#ef4444', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6']
 
 export default function AdminAnalyticsPage() {
-  const [reports, setReports] = useState<Report[]>([])
-
-  useEffect(() => {
-    const fetch = async () => {
-      const supabase = createClient()
-      const { data } = await supabase.from('reports').select('*').order('created_at', { ascending: false })
-      if (data) setReports(data)
-    }
-    fetch()
-  }, [])
+  const { reports } = useRealtimeReports()
 
   const categoryData = Object.entries(categoryLabels).map(([key, label]) => ({
     name: label.split(' ')[0],

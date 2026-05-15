@@ -4,26 +4,17 @@ export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Brain, Zap, TrendingUp, AlertTriangle, MapPin, BarChart3 } from 'lucide-react'
+import { Brain, Zap, TrendingUp, AlertTriangle, MapPin, BarChart3, Wifi } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { createClient } from '@/lib/supabase/client'
-import { categoryLabels } from '@/lib/utils'
+import { useRealtimeReports } from '@/hooks/useRealtimeReports'
 import { PriorityBadge } from '@/components/ui/priority-badge'
 import { getAIRecommendation } from '@/lib/ai-scoring'
+import { categoryLabels } from '@/lib/utils'
 import type { Report } from '@/types'
 
 export default function AIInsightsPage() {
-  const [reports, setReports] = useState<Report[]>([])
-
-  useEffect(() => {
-    const fetch = async () => {
-      const supabase = createClient()
-      const { data } = await supabase.from('reports').select('*').order('ai_score', { ascending: false })
-      if (data) setReports(data)
-    }
-    fetch()
-  }, [])
+  const { reports } = useRealtimeReports()
 
   const highRiskReports = reports.filter(r => r.priority === 'high' && r.status !== 'resolved')
   const topCategories = Object.entries(categoryLabels)
@@ -46,6 +37,10 @@ export default function AIInsightsPage() {
         <div className="flex items-center gap-2 mb-2">
           <Brain className="w-5 h-5 text-cyan-400" />
           <h1 className="text-xl lg:text-2xl font-bold text-white">AI Insights</h1>
+          <div className="flex items-center gap-1 ml-auto">
+            <Wifi className="w-3 h-3 text-cyan-400" />
+            <span className="text-xs text-cyan-400 font-mono">LIVE</span>
+          </div>
         </div>
         <p className="text-slate-400 text-sm">Analisis cerdas dan rekomendasi berbasis AI</p>
       </div>
