@@ -216,8 +216,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email support@pantau62.id or open an issue on GitHub.
+For support, email ilham.22315027@umkendari.ac.id or open an issue on GitHub.
 
----
-
-**Made with ❤️ for Indonesia's Smart Cities**
