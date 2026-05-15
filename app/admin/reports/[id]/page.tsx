@@ -63,43 +63,42 @@ export default function ReportDetailPage() {
   const recommendation = getAIRecommendation({ category: report.category, priority: report.priority, location: report.location, ai_score: report.ai_score })
 
   return (
-    <div className="p-8 min-h-screen grid-bg">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-6 gap-2">
+    <div className="p-4 lg:p-8 min-h-screen grid-bg">
+      <Button variant="ghost" onClick={() => router.back()} className="mb-4 gap-2 -ml-2">
         <ArrowLeft className="w-4 h-4" /> Kembali
       </Button>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4">
         {/* Main */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Image */}
+        <div className="lg:col-span-2 space-y-4">
           {report.image_url && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <img src={report.image_url} alt={report.title} className="w-full h-64 object-cover rounded-2xl border border-slate-700/50" />
+              <img src={report.image_url} alt={report.title} className="w-full h-48 lg:h-64 object-cover rounded-2xl border border-slate-700/50" />
             </motion.div>
           )}
 
-          {/* Info */}
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div>
-                  <h1 className="text-xl font-bold text-white mb-2">{report.title}</h1>
+            <CardContent className="p-4 lg:p-6">
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <div className="min-w-0">
+                  <h1 className="text-lg lg:text-xl font-bold text-white mb-2 leading-tight">{report.title}</h1>
                   <div className="flex items-center gap-2 text-sm text-slate-400">
-                    <MapPin className="w-4 h-4" /> {report.location}
+                    <MapPin className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{report.location}</span>
                   </div>
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex flex-col gap-1.5 flex-shrink-0">
                   <PriorityBadge priority={report.priority} />
-                  <Badge className={`${statusConfig[report.status].bg} ${statusConfig[report.status].color} border`}>
+                  <Badge className={`${statusConfig[report.status].bg} ${statusConfig[report.status].color} border text-xs`}>
                     {statusConfig[report.status].label}
                   </Badge>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 mb-4 p-4 rounded-xl bg-slate-900/50 border border-slate-700/50">
+              <div className="grid grid-cols-3 gap-3 mb-4 p-3 rounded-xl bg-slate-900/50 border border-slate-700/50">
                 <div>
                   <div className="text-xs text-slate-500 mb-1">Kategori</div>
-                  <div className="text-sm text-white">{categoryLabels[report.category as keyof typeof categoryLabels]}</div>
+                  <div className="text-xs lg:text-sm text-white">{categoryLabels[report.category as keyof typeof categoryLabels]}</div>
                 </div>
                 <div>
                   <div className="text-xs text-slate-500 mb-1">AI Score</div>
@@ -118,75 +117,65 @@ export default function ReportDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Map */}
           {report.latitude && report.longitude && (
             <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="w-4 h-4 text-cyan-400" /> Lokasi</CardTitle></CardHeader>
-              <CardContent>
-                <ReportsMap reports={[report]} height="250px" showDetailButton={false} />
+              <CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-sm lg:text-base"><MapPin className="w-4 h-4 text-cyan-400" /> Lokasi</CardTitle></CardHeader>
+              <CardContent className="p-2 lg:p-6">
+                <ReportsMap reports={[report]} height="220px" showDetailButton={false} />
               </CardContent>
             </Card>
           )}
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
-          {/* AI Recommendation */}
+        <div className="space-y-4">
           <Card className="border-cyan-500/20 bg-cyan-500/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm lg:text-base">
                 <Brain className="w-4 h-4 text-cyan-400" /> AI Recommendation
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 lg:p-6">
               <p className="text-sm text-slate-300 leading-relaxed">{recommendation}</p>
               <div className="mt-4 flex items-center gap-2">
-                <div className="text-xs text-slate-500">Confidence Score:</div>
+                <div className="text-xs text-slate-500">Confidence:</div>
                 <div className="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"
-                    style={{ width: `${Math.min(100, report.ai_score * 10)}%` }}
-                  />
+                  <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"
+                    style={{ width: `${Math.min(100, report.ai_score * 10)}%` }} />
                 </div>
                 <div className="text-xs text-cyan-400">{Math.min(100, report.ai_score * 10)}%</div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Actions */}
           <Card>
-            <CardHeader><CardTitle className="text-base">Update Status</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <Button
-                className="w-full gap-2"
+            <CardHeader className="pb-2"><CardTitle className="text-sm lg:text-base">Update Status</CardTitle></CardHeader>
+            <CardContent className="p-4 lg:p-6 space-y-3">
+              <Button className="w-full gap-2 text-sm"
                 variant={report.status === 'processing' ? 'secondary' : 'default'}
                 onClick={() => updateStatus('processing')}
-                disabled={report.status === 'processing' || report.status === 'resolved' || updating}
-              >
+                disabled={report.status === 'processing' || report.status === 'resolved' || updating}>
                 {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Clock className="w-4 h-4" />}
                 Mark as Processing
               </Button>
-              <Button
-                className="w-full gap-2 bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30"
+              <Button className="w-full gap-2 text-sm bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30"
                 onClick={() => updateStatus('resolved')}
-                disabled={report.status === 'resolved' || updating}
-              >
+                disabled={report.status === 'resolved' || updating}>
                 {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 Resolve Report
               </Button>
             </CardContent>
           </Card>
 
-          {/* Timeline */}
           <Card>
-            <CardHeader><CardTitle className="text-base">Timeline Status</CardTitle></CardHeader>
-            <CardContent>
+            <CardHeader className="pb-2"><CardTitle className="text-sm lg:text-base">Timeline Status</CardTitle></CardHeader>
+            <CardContent className="p-4 lg:p-6">
               <div className="space-y-4">
                 {[
                   { status: 'pending', label: 'Laporan Diterima', done: true },
                   { status: 'processing', label: 'Sedang Diproses', done: report.status === 'processing' || report.status === 'resolved' },
                   { status: 'resolved', label: 'Selesai Ditangani', done: report.status === 'resolved' },
-                ].map((step, i) => (
+                ].map(step => (
                   <div key={step.status} className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${step.done ? 'bg-green-500/20 border border-green-500/30' : 'bg-slate-700/50 border border-slate-600'}`}>
                       {step.done ? <CheckCircle className="w-4 h-4 text-green-400" /> : <div className="w-2 h-2 rounded-full bg-slate-600" />}

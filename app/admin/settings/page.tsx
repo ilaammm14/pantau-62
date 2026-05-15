@@ -41,22 +41,22 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="p-8 min-h-screen grid-bg">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Settings className="w-6 h-6 text-cyan-400" /> Settings
+    <div className="p-4 lg:p-8 min-h-screen grid-bg">
+      <div className="mb-6">
+        <h1 className="text-xl lg:text-2xl font-bold text-white flex items-center gap-2">
+          <Settings className="w-5 h-5 text-cyan-400" /> Settings
         </h1>
         <p className="text-slate-400 text-sm mt-1">Kelola pengaturan akun dan sistem</p>
       </div>
 
-      <div className="max-w-2xl space-y-6">
+      <div className="max-w-2xl space-y-4">
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm lg:text-base">
               <User className="w-4 h-4 text-cyan-400" /> Profil Admin
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-4 lg:p-6 space-y-4">
             <div className="space-y-2">
               <Label>Nama Lengkap</Label>
               <Input value={fullName} onChange={e => setFullName(e.target.value)} />
@@ -71,7 +71,7 @@ export default function AdminSettingsPage() {
                 <Shield className="w-4 h-4" /> Administrator
               </div>
             </div>
-            <Button onClick={handleSave} disabled={saving} className="gap-2">
+            <Button onClick={handleSave} disabled={saving} className="gap-2 w-full sm:w-auto">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" /> : null}
               {saved ? 'Tersimpan!' : 'Simpan Perubahan'}
             </Button>
@@ -79,12 +79,12 @@ export default function AdminSettingsPage() {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm lg:text-base">
               <Bell className="w-4 h-4 text-yellow-400" /> Sistem Info
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 lg:p-6">
             <div className="space-y-3 text-sm">
               {[
                 { label: 'Platform', value: 'PANTAU+62 v1.0.0' },

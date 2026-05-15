@@ -76,43 +76,43 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="p-8 grid-bg min-h-screen">
+    <div className="p-4 lg:p-8 grid-bg min-h-screen">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
           <span className="text-xs text-slate-500 font-mono">SYSTEM ONLINE</span>
         </div>
-        <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
+        <h1 className="text-xl lg:text-2xl font-bold text-white">Admin Dashboard</h1>
         <p className="text-slate-400 text-sm">Smart City Monitoring & Decision Support</p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
         {statCards.map((card, i) => (
           <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
             <Card className={`border ${card.bg}`}>
-              <CardContent className="p-5">
-                <card.icon className={`w-5 h-5 ${card.color} mb-3`} />
-                <div className={`text-2xl font-bold ${card.color}`}>{loading ? '—' : card.value}</div>
-                <div className="text-xs text-slate-500 mt-1">{card.label}</div>
+              <CardContent className="p-4">
+                <card.icon className={`w-4 h-4 ${card.color} mb-2`} />
+                <div className={`text-xl lg:text-2xl font-bold ${card.color}`}>{loading ? '—' : card.value}</div>
+                <div className="text-xs text-slate-500 mt-0.5 leading-tight">{card.label}</div>
               </CardContent>
             </Card>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid lg:grid-cols-3 gap-4 mb-4">
         {/* Trend */}
         <div className="lg:col-span-2">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm lg:text-base">
                 <TrendingUp className="w-4 h-4 text-cyan-400" /> Tren Laporan Mingguan
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={200}>
+            <CardContent className="p-3 lg:p-6">
+              <ResponsiveContainer width="100%" height={180}>
                 <AreaChart data={trendData}>
                   <defs>
                     <linearGradient id="gLaporan" x1="0" y1="0" x2="0" y2="1">
@@ -121,9 +121,9 @@ export default function AdminDashboard() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis dataKey="day" stroke="#475569" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#475569" tick={{ fontSize: 11 }} />
-                  <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff' }} />
+                  <XAxis dataKey="day" stroke="#475569" tick={{ fontSize: 10 }} />
+                  <YAxis stroke="#475569" tick={{ fontSize: 10 }} width={25} />
+                  <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }} />
                   <Area type="monotone" dataKey="laporan" stroke="#06b6d4" fill="url(#gLaporan)" strokeWidth={2} name="Laporan" />
                   <Area type="monotone" dataKey="selesai" stroke="#22c55e" fill="none" strokeWidth={2} strokeDasharray="4 4" name="Selesai" />
                 </AreaChart>
@@ -134,16 +134,16 @@ export default function AdminDashboard() {
 
         {/* Category Bar */}
         <Card>
-          <CardHeader>
-            <CardTitle>Per Kategori</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm lg:text-base">Per Kategori</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
+          <CardContent className="p-3 lg:p-6">
+            <ResponsiveContainer width="100%" height={180}>
               <BarChart data={categoryChartData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis type="number" stroke="#475569" tick={{ fontSize: 10 }} />
-                <YAxis dataKey="name" type="category" stroke="#475569" tick={{ fontSize: 10 }} width={60} />
-                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff' }} />
+                <XAxis type="number" stroke="#475569" tick={{ fontSize: 9 }} />
+                <YAxis dataKey="name" type="category" stroke="#475569" tick={{ fontSize: 9 }} width={45} />
+                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }} />
                 <Bar dataKey="count" fill="#06b6d4" radius={[0, 4, 4, 0]} name="Laporan" />
               </BarChart>
             </ResponsiveContainer>
@@ -152,24 +152,24 @@ export default function AdminDashboard() {
       </div>
 
       {/* AI Recommendations */}
-      <Card className="mb-6 border-cyan-500/20 bg-cyan-500/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="mb-4 border-cyan-500/20 bg-cyan-500/5">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-sm lg:text-base">
             <Brain className="w-4 h-4 text-cyan-400" /> AI Recommendations
-            <Badge className="ml-auto">Live</Badge>
+            <Badge className="ml-auto text-xs">Live</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 lg:p-6">
           {highPriorityReports.length === 0 ? (
             <p className="text-slate-400 text-sm">Tidak ada laporan prioritas tinggi saat ini. ✅</p>
           ) : (
             <div className="space-y-3">
               {highPriorityReports.map(report => (
-                <div key={report.id} className="flex items-start gap-3 p-4 rounded-xl bg-red-500/5 border border-red-500/20">
+                <div key={report.id} className="flex items-start gap-3 p-3 rounded-xl bg-red-500/5 border border-red-500/20">
                   <Zap className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <div className="text-sm font-medium text-white mb-1">{report.title}</div>
-                    <div className="text-xs text-slate-400">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-white mb-1 truncate">{report.title}</div>
+                    <div className="text-xs text-slate-400 leading-relaxed">
                       {getAIRecommendation({ category: report.category, priority: report.priority, location: report.location, ai_score: report.ai_score })}
                     </div>
                   </div>
@@ -180,13 +180,42 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
 
-      {/* Recent Reports */}
+      {/* Recent Reports — mobile card layout, desktop table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Laporan Terbaru</CardTitle>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm lg:text-base">Laporan Terbaru</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-0">
+          {/* Mobile: card list */}
+          <div className="lg:hidden divide-y divide-slate-800/50">
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="p-4"><div className="h-14 rounded-xl skeleton" /></div>
+              ))
+            ) : reports.slice(0, 8).map(report => (
+              <div key={report.id} className="p-4 flex gap-3 items-start">
+                {report.image_url ? (
+                  <img src={report.image_url} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center text-base flex-shrink-0">
+                    {report.category === 'sampah' ? '🗑️' : report.category === 'banjir' ? '🌊' : '⚠️'}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-white text-sm truncate">{report.title}</div>
+                  <div className="text-xs text-slate-500 truncate mt-0.5">{report.location}</div>
+                  <div className="flex gap-1.5 mt-1.5 flex-wrap">
+                    <Badge className={`${statusConfig[report.status].bg} ${statusConfig[report.status].color} border text-xs`}>
+                      {statusConfig[report.status].label}
+                    </Badge>
+                    <span className="text-xs text-cyan-400 font-mono">AI:{report.ai_score}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Desktop: table */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700/50">

@@ -61,22 +61,22 @@ export default function AdminAnalyticsPage() {
   }))
 
   return (
-    <div className="p-8 min-h-screen grid-bg">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Analytics Dashboard</h1>
+    <div className="p-4 lg:p-8 min-h-screen grid-bg">
+      <div className="mb-6">
+        <h1 className="text-xl lg:text-2xl font-bold text-white">Analytics Dashboard</h1>
         <p className="text-slate-400 text-sm mt-1">Analisis mendalam data laporan publik</p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6 mb-6">
+      <div className="grid lg:grid-cols-2 gap-4 mb-4">
         {/* 30-day trend */}
         <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm lg:text-base">
               <TrendingUp className="w-4 h-4 text-cyan-400" /> Tren 30 Hari Terakhir
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
+          <CardContent className="p-3 lg:p-6">
+            <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="gL" x1="0" y1="0" x2="0" y2="1">
@@ -89,9 +89,9 @@ export default function AdminAnalyticsPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="date" stroke="#475569" tick={{ fontSize: 10 }} interval={4} />
-                <YAxis stroke="#475569" tick={{ fontSize: 10 }} />
-                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff' }} />
+                <XAxis dataKey="date" stroke="#475569" tick={{ fontSize: 9 }} interval={6} />
+                <YAxis stroke="#475569" tick={{ fontSize: 9 }} width={25} />
+                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff', fontSize: '11px' }} />
                 <Area type="monotone" dataKey="laporan" stroke="#06b6d4" fill="url(#gL)" strokeWidth={2} name="Total" />
                 <Area type="monotone" dataKey="high" stroke="#ef4444" fill="url(#gH)" strokeWidth={2} name="High Priority" />
               </AreaChart>
@@ -101,18 +101,18 @@ export default function AdminAnalyticsPage() {
 
         {/* Category bar */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-blue-400" /> Laporan per Kategori
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <BarChart3 className="w-4 h-4 text-blue-400" /> Per Kategori
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
+          <CardContent className="p-3 lg:p-6">
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={categoryData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="name" stroke="#475569" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#475569" tick={{ fontSize: 11 }} />
-                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff' }} />
+                <XAxis dataKey="name" stroke="#475569" tick={{ fontSize: 9 }} />
+                <YAxis stroke="#475569" tick={{ fontSize: 9 }} width={25} />
+                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff', fontSize: '11px' }} />
                 <Bar dataKey="total" fill="#06b6d4" radius={[4, 4, 0, 0]} name="Total" />
                 <Bar dataKey="resolved" fill="#22c55e" radius={[4, 4, 0, 0]} name="Resolved" />
               </BarChart>
@@ -122,18 +122,19 @@ export default function AdminAnalyticsPage() {
 
         {/* Priority pie */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
               <PieIcon className="w-4 h-4 text-purple-400" /> Distribusi Prioritas
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
+          <CardContent className="p-3 lg:p-6">
+            <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <Pie data={priorityData} cx="50%" cy="50%" outerRadius={90} paddingAngle={4} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
+                <Pie data={priorityData} cx="50%" cy="50%" outerRadius={75} paddingAngle={4} dataKey="value"
+                  label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
                   {priorityData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                 </Pie>
-                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff' }} />
+                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff', fontSize: '11px' }} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -141,31 +142,31 @@ export default function AdminAnalyticsPage() {
 
         {/* Radar */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
               <Activity className="w-4 h-4 text-cyan-400" /> Radar Kategori
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
+          <CardContent className="p-3 lg:p-6">
+            <ResponsiveContainer width="100%" height={200}>
               <RadarChart data={radarData}>
                 <PolarGrid stroke="#1e293b" />
-                <PolarAngleAxis dataKey="category" tick={{ fontSize: 11, fill: '#94a3b8' }} />
+                <PolarAngleAxis dataKey="category" tick={{ fontSize: 9, fill: '#94a3b8' }} />
                 <Radar name="Laporan" dataKey="laporan" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.2} />
                 <Radar name="Resolved" dataKey="resolved" stroke="#22c55e" fill="#22c55e" fillOpacity={0.2} />
-                <Legend wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }} />
-                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff' }} />
+                <Legend wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }} />
+                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', color: '#fff', fontSize: '11px' }} />
               </RadarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Status Overview</CardTitle>
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm lg:text-base">Status Overview</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 lg:p-6">
             <div className="space-y-4">
               {statusData.map((s, i) => {
                 const total = reports.length || 1

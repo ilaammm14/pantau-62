@@ -116,58 +116,121 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <div className="p-8 min-h-screen grid-bg">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Reports Management</h1>
+    <div className="p-4 lg:p-8 min-h-screen grid-bg">
+      <div className="mb-6">
+        <h1 className="text-xl lg:text-2xl font-bold text-white">Reports Management</h1>
         <p className="text-slate-400 text-sm mt-1">{filtered.length} laporan ditemukan</p>
       </div>
 
       {/* Filters */}
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-3">
-            <div className="relative flex-1 min-w-[200px]">
+      <Card className="mb-4">
+        <CardContent className="p-3 lg:p-4">
+          <div className="flex flex-col gap-3">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input 
-                placeholder="Cari laporan..." 
-                value={search} 
-                onChange={e => setSearch(e.target.value)} 
-                className="pl-10" 
+              <Input
+                placeholder="Cari laporan..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-10"
               />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-40"><SelectValue placeholder="Kategori" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Kategori</SelectItem>
-                {Object.entries(categoryLabels).map(([v, l]) => (
-                  <SelectItem key={v} value={v}>{l}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-              <SelectTrigger className="w-36"><SelectValue placeholder="Priority" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Priority</SelectItem>
-                <SelectItem value="high">HIGH</SelectItem>
-                <SelectItem value="medium">MEDIUM</SelectItem>
-                <SelectItem value="low">LOW</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-36"><SelectValue placeholder="Status" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-3 gap-2">
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="text-xs"><SelectValue placeholder="Kategori" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua</SelectItem>
+                  {Object.entries(categoryLabels).map(([v, l]) => (
+                    <SelectItem key={v} value={v}>{l.split(' ')[0]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                <SelectTrigger className="text-xs"><SelectValue placeholder="Priority" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua</SelectItem>
+                  <SelectItem value="high">HIGH</SelectItem>
+                  <SelectItem value="medium">MEDIUM</SelectItem>
+                  <SelectItem value="low">LOW</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="processing">Processing</SelectItem>
+                  <SelectItem value="resolved">Resolved</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Table */}
-      <Card>
+      {/* Mobile: card list */}
+      <div className="lg:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-24 rounded-2xl skeleton" />)
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 text-slate-500">Tidak ada laporan ditemukan</div>
+        ) : filtered.map(report => (
+          <motion.div key={report.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <Card className="hover:border-slate-600 transition-all">
+              <CardContent className="p-4">
+                <div className="flex gap-3">
+                  {report.image_url ? (
+                    <img src={report.image_url} alt="" className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-slate-700 flex items-center justify-center text-xl flex-shrink-0">
+                      {report.category === 'sampah' ? '🗑️' : report.category === 'banjir' ? '🌊' : '⚠️'}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-white text-sm truncate">{report.title}</div>
+                    <div className="text-xs text-slate-500 truncate mt-0.5">{report.location}</div>
+                    <div className="flex gap-1.5 mt-2 flex-wrap items-center">
+                      <PriorityBadge priority={report.priority} />
+                      <Badge className={`${statusConfig[report.status].bg} ${statusConfig[report.status].color} border text-xs`}>
+                        {statusConfig[report.status].label}
+                      </Badge>
+                      <span className="text-xs text-cyan-400 font-mono ml-auto">AI:{report.ai_score}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-1 mt-3 pt-3 border-t border-slate-700/50">
+                  <Link href={`/admin/reports/${report.id}`} className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full gap-1 text-xs h-8">
+                      <Eye className="w-3 h-3" /> Lihat
+                    </Button>
+                  </Link>
+                  {report.status === 'pending' && (
+                    <Button variant="outline" size="sm" className="flex-1 gap-1 text-xs h-8 text-blue-400 border-blue-500/30"
+                      onClick={() => updateStatus(report.id, 'processing')} disabled={updating === report.id}>
+                      {updating === report.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Clock className="w-3 h-3" />}
+                      Proses
+                    </Button>
+                  )}
+                  {report.status === 'processing' && (
+                    <Button variant="outline" size="sm" className="flex-1 gap-1 text-xs h-8 text-green-400 border-green-500/30"
+                      onClick={() => updateStatus(report.id, 'resolved')} disabled={updating === report.id}>
+                      {updating === report.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
+                      Selesai
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:text-red-300 flex-shrink-0"
+                    onClick={() => handleDeleteClick(report)} disabled={updating === report.id}>
+                    {updating === report.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Desktop: table */}
+      <Card className="hidden lg:block">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -181,26 +244,14 @@ export default function AdminReportsPage() {
               <tbody>
                 {loading ? (
                   Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i}>
-                      <td colSpan={8} className="py-3 px-4">
-                        <div className="h-12 rounded skeleton" />
-                      </td>
-                    </tr>
+                    <tr key={i}><td colSpan={8} className="py-3 px-4"><div className="h-12 rounded skeleton" /></td></tr>
                   ))
                 ) : filtered.map(report => (
-                  <motion.tr
-                    key={report.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors"
-                  >
+                  <motion.tr key={report.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
                     <td className="py-3 px-4">
                       {report.image_url ? (
-                        <img 
-                          src={report.image_url} 
-                          alt={report.title} 
-                          className="w-10 h-10 rounded-lg object-cover" 
-                        />
+                        <img src={report.image_url} alt={report.title} className="w-10 h-10 rounded-lg object-cover" />
                       ) : (
                         <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center text-lg">
                           {report.category === 'sampah' ? '🗑️' : report.category === 'banjir' ? '🌊' : '⚠️'}
@@ -211,72 +262,35 @@ export default function AdminReportsPage() {
                       <div className="font-medium text-white truncate max-w-[160px]">{report.title}</div>
                       <div className="text-xs text-slate-500">{formatDate(report.created_at)}</div>
                     </td>
-                    <td className="py-3 px-4 text-slate-400 text-xs">
-                      {categoryLabels[report.category as keyof typeof categoryLabels]}
-                    </td>
-                    <td className="py-3 px-4 text-slate-400 text-xs truncate max-w-[120px]">
-                      {report.location}
-                    </td>
-                    <td className="py-3 px-4">
-                      <PriorityBadge priority={report.priority} />
-                    </td>
+                    <td className="py-3 px-4 text-slate-400 text-xs">{categoryLabels[report.category as keyof typeof categoryLabels]}</td>
+                    <td className="py-3 px-4 text-slate-400 text-xs truncate max-w-[120px]">{report.location}</td>
+                    <td className="py-3 px-4"><PriorityBadge priority={report.priority} /></td>
                     <td className="py-3 px-4">
                       <Badge className={`${statusConfig[report.status].bg} ${statusConfig[report.status].color} border text-xs`}>
                         {statusConfig[report.status].label}
                       </Badge>
                     </td>
-                    <td className="py-3 px-4">
-                      <span className="text-cyan-400 font-mono text-sm">{report.ai_score}</span>
-                    </td>
+                    <td className="py-3 px-4"><span className="text-cyan-400 font-mono text-sm">{report.ai_score}</span></td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-1">
                         <Link href={`/admin/reports/${report.id}`}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Eye className="w-3.5 h-3.5" />
-                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8"><Eye className="w-3.5 h-3.5" /></Button>
                         </Link>
                         {report.status === 'pending' && (
-                          <Button
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 text-blue-400 hover:text-blue-300"
-                            onClick={() => updateStatus(report.id, 'processing')}
-                            disabled={updating === report.id}
-                          >
-                            {updating === report.id ? (
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            ) : (
-                              <Clock className="w-3.5 h-3.5" />
-                            )}
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-400 hover:text-blue-300"
+                            onClick={() => updateStatus(report.id, 'processing')} disabled={updating === report.id}>
+                            {updating === report.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Clock className="w-3.5 h-3.5" />}
                           </Button>
                         )}
                         {report.status === 'processing' && (
-                          <Button
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 text-green-400 hover:text-green-300"
-                            onClick={() => updateStatus(report.id, 'resolved')}
-                            disabled={updating === report.id}
-                          >
-                            {updating === report.id ? (
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            ) : (
-                              <CheckCircle className="w-3.5 h-3.5" />
-                            )}
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-green-400 hover:text-green-300"
+                            onClick={() => updateStatus(report.id, 'resolved')} disabled={updating === report.id}>
+                            {updating === report.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
                           </Button>
                         )}
-                        <Button
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-red-400 hover:text-red-300"
-                          onClick={() => handleDeleteClick(report)}
-                          disabled={updating === report.id}
-                        >
-                          {updating === report.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-3.5 h-3.5" />
-                          )}
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:text-red-300"
+                          onClick={() => handleDeleteClick(report)} disabled={updating === report.id}>
+                          {updating === report.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                         </Button>
                       </div>
                     </td>
@@ -285,9 +299,7 @@ export default function AdminReportsPage() {
               </tbody>
             </table>
             {!loading && filtered.length === 0 && (
-              <div className="text-center py-16 text-slate-500">
-                Tidak ada laporan ditemukan
-              </div>
+              <div className="text-center py-16 text-slate-500">Tidak ada laporan ditemukan</div>
             )}
           </div>
         </CardContent>
