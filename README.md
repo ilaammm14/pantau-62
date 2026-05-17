@@ -7,7 +7,7 @@
 
 Platform berbasis AI untuk monitoring, analisis, prediksi, dan penanganan masalah publik secara real-time di Indonesia.
 
-![PANTAU+62 Dashboard](https://via.placeholder.com/800x400/020817/06b6d4?text=PANTAU%2B62+Dashboard)
+![PANTAU+62 Dashboard]([https://via.placeholder.com/800x400/020817/06b6d4?text=PANTAU%2B62+Dashboard](https://pantau62.vercel.app/))
 
 ## ✨ Features
 
